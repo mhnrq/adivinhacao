@@ -20,9 +20,22 @@ body {
   top: 60px;
   left: 230px;
   width: 460px;
-  font-size: 20px;
-  line-height: 1.5;
+  height: 150px; /* altura fixa para controlar o espaço */
+  padding: 20px;
+  font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
+  font-size: 22px;
+  color: #333;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+
+  display: flex;
+  justify-content: center; /* centraliza horizontal */
+  align-items: center;     /* centraliza vertical */
+  text-align: center;      /* centraliza texto dentro da caixa */
+  white-space: pre-wrap;   /* para respeitar quebras de linha */
 }
+
 
 button {
   position: absolute;
