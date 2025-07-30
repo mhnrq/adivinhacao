@@ -1,20 +1,386 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Jogo de Adivinhação</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Adivinhação</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: transparent;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+
+        .professor-container {
+            position: relative;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .professor-circle {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border: 3px solid #8B4513;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: #8B4513;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .speech-bubble {
+            background: rgba(255, 248, 220, 0.95);
+            border: 3px solid #8B4513;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px auto;
+            position: relative;
+            font-size: 18px;
+            line-height: 1.5;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .speech-bubble:before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 15px solid #8B4513;
+        }
+
+        .button {
+            background: #8B4513;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .button:hover {
+            background: #A0522D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .button.no {
+            background: #CD5C5C;
+        }
+
+        .button.no:hover {
+            background: #DC143C;
+        }
+
+        .numbers-container {
+            background: rgba(255, 248, 220, 0.9);
+            border: 3px solid #8B4513;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .number-cell {
+            background: linear-gradient(135deg, #F0E68C, #DAA520);
+            border: 2px solid #B8860B;
+            border-radius: 10px;
+            padding: 12px 8px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            transition: all 0.2s ease;
+            cursor: default;
+        }
+
+        .number-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .cartao-titulo {
+            font-size: 24px;
+            color: #8B4513;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .buttons-container {
+            margin-top: 20px;
+        }
+
+            @media (max-width: 480px) {
+            .professor-circle {
+                width: 120px;
+                height: 120px;
+                font-size: 50px;
+            }
+            
+            .speech-bubble {
+                font-size: 16px;
+                padding: 15px;
+            }
+            
+            .numbers-grid {
+                grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+                gap: 8px;
+            }
+            
+            .number-cell {
+                padding: 10px 6px;
+                font-size: 16px;
+            }
+
+            .button {
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+        }
+
+        /* Animações */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-  <div id="jogo">
-    <img id="fundo" src="imagens/FOTO 1.png" alt="Fundo do jogo">
-    <div id="fala">Olá! Vamos jogar um jogo. Pense em um número entre 1 e 63.</div>
+    <div class="game-container">
+        
+        <!-- Tela Inicial -->
+        <div id="tela-inicial" class="fade-in">
+            <div class="professor-container">
+                <div class="professor-circle">😊</div>
+            </div>
+            <div class="speech-bubble">
+                <p>Olá! Vamos jogar o jogo da adivinhação? 🎯</p>
+                <p>Pense em um número de <strong>1 a 63</strong> e eu vou adivinhar qual é!</p>
+            </div>
+            <div class="buttons-container">
+                <button class="button" onclick="iniciarJogo()">Começar o Jogo</button>
+            </div>
+        </div>
 
-    <button id="btn1" onclick="comecar()">Começar</button>
-    <button id="btn2" onclick="responder(true)">Sim</button>
-    <button id="btn3" onclick="responder(false)">Não</button>
-  </div>
+        <!-- Tela de Instruções -->
+        <div id="tela-instrucoes" class="hidden">
+            <div class="professor-container">
+                <div class="professor-circle">🤔</div>
+            </div>
+            <div class="speech-bubble">
+                <p>Agora escolha um número de <strong>1 a 63</strong> e mantenha ele em segredo! 🤫</p>
+                <p>Quando estiver pronto, clique no botão abaixo.</p>
+            </div>
+            <div class="buttons-container">
+                <button class="button" onclick="mostrarCartao()">Estou Pronto!</button>
+            </div>
+        </div>
 
-  <script src="script.js"></script>
+        <!-- Tela dos Cartões -->
+        <div id="tela-cartao" class="hidden">
+            <div class="professor-container" style="margin-bottom: 40px;">
+                <div class="professor-circle">🤓</div>
+            </div>
+            <div class="speech-bubble">
+                <p>Seu número está neste cartão? 🤔</p>
+            </div>
+            <div class="numbers-container">
+                <div class="numbers-grid" id="numeros-cartao">
+                    <!-- Números serão inseridos aqui -->
+                </div>
+            </div>
+            <div class="buttons-container">
+                <button class="button" onclick="responder(true)">SIM</button>
+                <button class="button no" onclick="responder(false)">NÃO</button>
+            </div>
+        </div>
+
+        <!-- Tela de Revelação -->
+        <div id="tela-revelacao" class="hidden">
+            <div class="professor-container">
+                <div class="professor-circle">✨</div>
+            </div>
+            <div class="speech-bubble">
+                <p>🎉 Então o número que você escolheu é <strong><span id="numero-adivinhado">0</span></strong>!</p>
+                <p>Acertei? 😊</p>
+            </div>
+            <div class="buttons-container">
+                <button class="button" onclick="confirmarResultado(true)">Sim, acertou!</button>
+                <button class="button no" onclick="confirmarResultado(false)">Não, errou</button>
+            </div>
+        </div>
+
+        <!-- Tela de Resultado -->
+        <div id="tela-resultado" class="hidden">
+            <div class="professor-container">
+                <div class="professor-circle">🎉</div>
+            </div>
+            <div class="speech-bubble" id="mensagem-resultado">
+                <!-- Mensagem será inserida aqui -->
+            </div>
+            <div class="buttons-container">
+                <button class="button" onclick="reiniciarJogo()">Jogar Novamente</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cartões do jogo (representação binária)
+        const cartoes = [
+            [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63],
+            [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31, 34, 35, 38, 39, 42, 43, 46, 47, 50, 51, 54, 55, 58, 59, 62, 63],
+            [4, 5, 6, 7, 12, 13, 14, 15, 20, 21, 22, 23, 28, 29, 30, 31, 36, 37, 38, 39, 44, 45, 46, 47, 52, 53, 54, 55, 60, 61, 62, 63],
+            [8, 9, 10, 11, 12, 13, 14, 15, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 42, 43, 44, 45, 46, 47, 56, 57, 58, 59, 60, 61, 62, 63],
+            [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63],
+            [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+        ];
+
+        const valoresBinarios = [1, 2, 4, 8, 16, 32];
+        
+        let cartaoAtual = 0;
+        let numeroAdivinhado = 0;
+
+        function mostrarTela(idTela) {
+            // Esconder todas as telas
+            const telas = ['tela-inicial', 'tela-instrucoes', 'tela-cartao', 'tela-revelacao', 'tela-resultado'];
+            telas.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            
+            // Mostrar tela específica com animação
+            const telaAtiva = document.getElementById(idTela);
+            telaAtiva.classList.remove('hidden');
+            telaAtiva.classList.add('fade-in');
+            
+            // Remover classe de animação após completar
+            setTimeout(() => {
+                telaAtiva.classList.remove('fade-in');
+            }, 500);
+        }
+
+        function iniciarJogo() {
+            mostrarTela('tela-instrucoes');
+        }
+
+        function mostrarCartao() {
+            cartaoAtual = 0;
+            numeroAdivinhado = 0;
+            exibirCartao();
+        }
+
+        function embaralharArray(array) {
+            const arrayEmbaralhado = [...array];
+            for (let i = arrayEmbaralhado.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arrayEmbaralhado[i], arrayEmbaralhado[j]] = [arrayEmbaralhado[j], arrayEmbaralhado[i]];
+            }
+            return arrayEmbaralhado;
+        }
+
+        function exibirCartao() {
+            mostrarTela('tela-cartao');
+            
+            // Mostrar números do cartão atual em ordem numérica
+            const numerosContainer = document.getElementById('numeros-cartao');
+            numerosContainer.innerHTML = '';
+            
+            cartoes[cartaoAtual].forEach(numero => {
+                const cell = document.createElement('div');
+                cell.className = 'number-cell';
+                cell.textContent = numero;
+                numerosContainer.appendChild(cell);
+            });
+        }
+
+        function responder(temNumero) {
+            if (temNumero) {
+                numeroAdivinhado += valoresBinarios[cartaoAtual];
+            }
+            
+            cartaoAtual++;
+            
+            if (cartaoAtual < 6) {
+                // Próximo cartão
+                exibirCartao();
+            } else {
+                // Fim do jogo - revelar número
+                revelarNumero();
+            }
+        }
+
+        function revelarNumero() {
+            document.getElementById('numero-adivinhado').textContent = numeroAdivinhado;
+            mostrarTela('tela-revelacao');
+        }
+
+        function confirmarResultado(acertou) {
+            const mensagemContainer = document.getElementById('mensagem-resultado');
+            
+            if (acertou) {
+                mensagemContainer.innerHTML = '<p>🎉 <strong>Que legal!</strong> Consegui adivinhar seu número!</p><p>A mágica está na matemática! 🧙‍♂️✨</p>';
+            } else {
+                mensagemContainer.innerHTML = '<p>🤔 <strong>Ops!</strong> Talvez você tenha se confundido com algum cartão.</p><p>Vamos tentar novamente? 😊</p>';
+            }
+            
+            mostrarTela('tela-resultado');
+        }
+
+        function reiniciarJogo() {
+            cartaoAtual = 0;
+            numeroAdivinhado = 0;
+            mostrarTela('tela-inicial');
+        }
+    </script>
 </body>
 </html>
