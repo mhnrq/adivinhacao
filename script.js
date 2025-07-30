@@ -1,54 +1,59 @@
-body {
-  margin: 0;
-  font-family: sans-serif;
+const conjuntos = gerarCartoes(); // gera os 6 conjuntos de números
+let respostas = [];
+let etapa = 0;
+
+function comecar() {
+  respostas = [];
+  etapa = 0;
+  document.getElementById('fundo').src = 'imagens/FOTO 2.png';
+  mostrarEtapa();
 }
 
-#jogo {
-  position: relative;
-  width: 768px;
-  height: 768px;
-  margin: auto;
+function mostrarEtapa() {
+  if (etapa < conjuntos.length) {
+    const fala = `Seu número está aqui?\n\n${conjuntos[etapa].join(', ')}`;
+    document.getElementById('fala').innerText = fala;
+    document.getElementById('btn1').style.display = 'none';
+    document.getElementById('btn2').style.display = 'block';
+    document.getElementById('btn3').style.display = 'block';
+  } else {
+    // Final
+    const numero = calcularNumero(respostas);
+    document.getElementById('fundo').src = 'imagens/FOTO 1.png';
+    document.getElementById('fala').innerText = `Então o número que você pensou é: ${numero}!\nAcertei?`;
+    document.getElementById('btn1').innerText = 'Jogar de novo';
+    document.getElementById('btn1').style.display = 'block';
+    document.getElementById('btn2').style.display = 'none';
+    document.getElementById('btn3').style.display = 'none';
+  }
 }
 
-#fundo {
-  width: 100%;
-  height: 100%;
+function responder(valor) {
+  respostas.push(valor);
+  etapa++;
+  mostrarEtapa();
 }
 
-#fala {
-  position: absolute;
-  top: 60px;
-  left: 230px;
-  width: 460px;
-  font-size: 20px;
-  line-height: 1.5;
+function calcularNumero(respostas) {
+  let numero = 0;
+  for (let i = 0; i < respostas.length; i++) {
+    if (respostas[i]) {
+      numero += Math.pow(2, i);
+    }
+  }
+  return numero;
 }
 
-button {
-  position: absolute;
-  width: 180px;
-  height: 50px;
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-}
-
-#btn1 {
-  top: 460px;
-  left: 490px;
-}
-
-#btn2 {
-  top: 460px;
-  left: 490px;
-  display: none;
-}
-
-#btn3 {
-  top: 525px;
-  left: 490px;
-  display: none;
+function gerarCartoes() {
+  const cartoes = [];
+  for (let i = 0; i < 6; i++) {
+    const cartao = [];
+    for (let n = 1; n <= 63; n++) {
+      if ((n & Math.pow(2, i)) !== 0) {
+        cartao.push(n);
+      }
+    }
+    cartoes.push(cartao);
+  }
+  return cartoes;
 }
